@@ -1,0 +1,146 @@
+//
+//  BoardsViewController.m
+//  TeaHome
+//
+//  Created by andylee on 14-7-10.
+//  Copyright (c) 2014年 Ali Karagoz. All rights reserved.
+//
+
+#import "BoardsViewController.h"
+#import "ThreadsViewController.h"
+
+#define get_boards_cmd @"get_boards"
+
+@interface BoardsViewController ()
+
+@end
+
+@implementation BoardsViewController
+
+- (id)initWithStyle:(UITableViewStyle)style
+{
+    self = [super initWithStyle:style];
+    if (self) {
+        self.title = @"社区";
+    }
+    return self;
+}
+
+- (NSString *)tabImageName
+{
+	return @"coumunity_icon";
+}
+
+- (NSString *)tabTitle
+{
+	return self.title;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.tableView.backgroundColor = [UIColor whiteColor];
+    
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+
+//    if (![[Reachability reachabilityForInternetConnection] isReachable]) {
+//        [Utils showAlertViewWithMessage:@"无网络,请稍后再试."];
+//        return;
+//    }
+    if (![[Reachability reachabilityForInternetConnection] isReachable]) {
+        [Utils showAlertViewWithMessage:@"无网络,请稍后再试."];
+        return;
+    }
+    [self getBoardsFormWeb];
+    
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)getBoardsFormWeb
+{
+    //获取论坛板块
+    
+    NSString *str = [NSString stringWithFormat:@"%@%@",CMD_URL,get_boards_cmd];
+    id json = [Utils getJsonDataFromWeb:str];
+    if (json != nil) {
+        self.boards = [NSMutableArray arrayWithArray:json];
+    }else{
+        [Utils showAlertViewWithMessage:@"网络链接出错，请稍后再试."];
+    }
+    
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    // Return the number of sections.
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    // Return the number of rows in the section.
+    return [self.boards count];
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 156;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *CellIdentifier = @"Cell";
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    NSDictionary *board = [self.boards objectAtIndex:indexPath.row];
+    NSString *name = [board objectForKey:@"name"];
+//    int bid = [[board objectForKey:@"id"] intValue];
+    NSString *desc = [board objectForKey:@"desc"];
+    
+    UIImage *titleImage = [UIImage imageNamed:@"forum_title"];
+    UIImage *contentImage = [UIImage imageNamed:@"forum_content"];
+    
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, titleImage.size.width, titleImage.size.height)];
+    titleLabel.backgroundColor = [UIColor colorWithPatternImage:titleImage];
+    titleLabel.text = [NSString stringWithFormat:@"  %@",name];
+    titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:18];
+    titleLabel.textColor = [UIColor whiteColor];
+    [cell addSubview:titleLabel];
+
+    UIView *holderView = [[UIView alloc] initWithFrame:CGRectMake(titleLabel.frame.origin.x, titleLabel.frame.origin.y + titleLabel.frame.size.height, contentImage.size.width, contentImage.size.height)];
+    holderView.backgroundColor = [UIColor colorWithPatternImage:contentImage];
+    [cell addSubview:holderView];
+    
+    UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, holderView.frame.size.width - 30, 40)];
+    descLabel.numberOfLines = 0;
+    descLabel.textColor = [UIColor lightGrayColor];
+    descLabel.font = [UIFont systemFontOfSize:14];
+    descLabel.text = desc;    
+    [holderView addSubview:descLabel];
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    return cell;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *board = [self.boards objectAtIndex:indexPath.row];
+    NSString *name = [board objectForKey:@"name"];
+    int bid = [[board objectForKey:@"id"] intValue];
+    ThreadsViewController *tvc = [[ThreadsViewController alloc] init];
+    tvc.bid = bid;
+    tvc.name = name;
+    [self.navigationController pushViewController:tvc animated:YES];
+}
+
+@end

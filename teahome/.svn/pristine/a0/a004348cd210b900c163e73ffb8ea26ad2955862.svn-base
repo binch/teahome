@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>37B78A40-9D45-48B9-97A3-E3AE9380FB8E</string>
+	<key>IDESourceControlProjectName</key>
+	<string>TeaHome</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>7CDAE7AE-0DDD-460D-8BC0-B2D15D187A5D</key>
+		<string>https://115.29.179.50:444/svn/teahome-iphone/trunk/teahome</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>TeaHome/TeaHome.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>7CDAE7AE-0DDD-460D-8BC0-B2D15D187A5D</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>7CDAE7AE-0DDD-460D-8BC0-B2D15D187A5D</key>
+		<string>https://115.29.179.50:444/svn/teahome-iphone</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://115.29.179.50:444/svn/teahome-iphone/trunk/teahome/TeaHome/TeaHome.xcodeproj</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>7CDAE7AE-0DDD-460D-8BC0-B2D15D187A5D</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryBranchesRelativeLocationKey</key>
+			<string>branches</string>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlRepositoryTagsRelativeLocationKey</key>
+			<string>tags</string>
+			<key>IDESourceControlRepositoryTrunkRelativeLocationKey</key>
+			<string>trunk</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>7CDAE7AE-0DDD-460D-8BC0-B2D15D187A5D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>teahome</string>
+		</dict>
+	</array>
+</dict>
+</plist>

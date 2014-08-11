@@ -1,0 +1,175 @@
+//
+//  ShopViewController.m
+//  TeaHome
+//
+//  Created by andylee on 14-6-27.
+//  Copyright (c) 2014年 Ali Karagoz. All rights reserved.
+//
+
+#import "ShopViewController.h"
+#import "ProductViewController.h"
+#import "ShopViewDetailCell.h"
+#import "ShopViewDetailHeader.h"
+
+#define get_shop_cats_cmd @"get_shop_cats"
+#define share_shop_url @"shop/html/"
+
+@interface ShopViewController ()
+
+@end
+
+@implementation ShopViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    self.title = [self.shop objectForKey:@"title"];
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    [self initShopInfoView];
+    [self initCatsView];
+//    UIBarButtonItem *share = [[UIBarButtonItem alloc] initWithTitle:@"分享"
+//                                                              style:UIBarButtonItemStyleBordered
+//                                                             target:self
+//                                                             action:@selector(shareAction:)];
+//    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:share, nil];
+    
+}
+
+-(void)shareAction:(UIBarButtonItem *)item
+{
+    NSString *url = [NSString stringWithFormat:@"%@%@%d",share_root_url,share_shop_url,[[self.shop objectForKey:@"id"] intValue]];
+    
+}
+
+
+-(void)initCatsView
+{
+    int shopId = [[self.shop objectForKey:@"id"] intValue];
+    //所有店铺
+    NSString *url = [NSString stringWithFormat:@"%@%@&shop=%d",CMD_URL,get_shop_cats_cmd,shopId];
+    id jsonObj = [Utils getJsonDataFromWeb:url];
+    if (jsonObj != nil) {
+        self.cats = [NSArray arrayWithArray:(NSArray *)jsonObj];
+        
+        if (self.catsView == nil) {
+            self.layout = [[UICollectionViewFlowLayout alloc] init];
+            self.layout.minimumInteritemSpacing = 20;
+            self.layout.minimumLineSpacing = 10;
+            self.layout.sectionInset = UIEdgeInsetsMake(5, 5, 5, 5);
+            self.layout.itemSize = CGSizeMake(90, 150);
+            self.layout.headerReferenceSize = CGSizeMake(320, 20);
+            
+            self.catsView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, self.shopInfoView.bounds.size.height + 10, self.view.bounds.size.width, self.view.bounds.size.height  - self.shopInfoView.bounds.size.height) collectionViewLayout:self.layout];
+            self.catsView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+            self.catsView.backgroundColor = [UIColor whiteColor];
+            self.catsView.dataSource = self;
+            self.catsView.delegate = self;
+            [self.view addSubview:self.catsView];
+            
+            [self.catsView registerClass:[ShopViewDetailCell class] forCellWithReuseIdentifier:NSStringFromClass([ShopViewDetailCell class])];
+            [self.catsView registerClass:[ShopViewDetailHeader class]  forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:NSStringFromClass([ShopViewDetailHeader class])];
+        }
+        
+        [self.catsView reloadData];
+    }
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+-(void)initShopInfoView
+{
+    int shopId = [[self.shop objectForKey:@"id"] intValue];
+    
+    self.shopInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 60)];
+    self.shopInfoView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    self.shopInfoView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.shopInfoView];
+    
+    NSString *product_image_url = [NSString stringWithFormat:@"%@%d.jpg",shop_image_root_url,shopId];
+    NSURL *url = [NSURL URLWithString:product_image_url];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 120, 60)];
+    imageView.backgroundColor = [UIColor clearColor];
+    [imageView sd_setImageWithURL:url placeholderImage:[UIImage imageNamed:@"image_loading"]];
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.shopInfoView addSubview:imageView];
+    
+    NSString *title = [self.shop objectForKey:@"title"];
+    NSString *desc = [self.shop objectForKey:@"desc"];
+    UILabel *infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(140, 5, 120, 60)];
+    infoLabel.numberOfLines = 0;
+    infoLabel.backgroundColor = [UIColor clearColor];
+    infoLabel.text = [NSString stringWithFormat:@"%@\n%@",title,desc];
+    [self.shopInfoView addSubview:infoLabel];
+    
+}
+
+#pragma mark - collection view delegate method
+-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    NSArray *products = [[self.cats objectAtIndex:section] objectForKey:@"items"];
+    return [products count];
+}
+
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    return [self.cats count];
+}
+
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+    
+    ShopViewDetailHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:NSStringFromClass([ShopViewDetailHeader class]) forIndexPath:indexPath];
+    
+    NSDictionary *cat = [self.cats objectAtIndex:indexPath.section];
+    
+    header.catLabel.text = [NSString stringWithFormat:@"商品种类:%@",[cat objectForKey:@"name"]];
+    
+    return header;
+}
+
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    ShopViewDetailCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([ShopViewDetailCell class]) forIndexPath:indexPath];
+    
+    NSDictionary *product = [self.cats[indexPath.section] objectForKey:@"items"][indexPath.row];
+    NSString *title = [product objectForKey:@"title"];
+    float price = [[product objectForKey:@"price"] floatValue];
+    int productId = [[product objectForKey:@"id"] intValue];
+    int sold = [[product objectForKey:@"sold"] intValue];
+    
+    NSString *product_image_url = [NSString stringWithFormat:@"%@%d.jpg",product_image_root_url,productId];
+    NSURL *url = [NSURL URLWithString:product_image_url];
+    
+    [cell.imageView sd_setImageWithURL:url placeholderImage:[UIImage imageNamed:@"image_loading"]];
+    cell.titleLabel.text = title;
+    cell.soldLabel.text = [NSString stringWithFormat:@"销量:%d",sold];
+    cell.priceLabel.text = [NSString stringWithFormat:@"价格:%.1f元",price];
+    
+    return cell;
+}
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *product = [self.cats[indexPath.section] objectForKey:@"items"][indexPath.row];
+
+    ProductViewController *pvc = [[ProductViewController alloc] init];
+    pvc.product = product;
+    [self.navigationController pushViewController:pvc animated:YES];
+}
+@end
